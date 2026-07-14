@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>अस्पताल रोगी पोर्टल</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@500;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F3EC;
+    --card:#FFFFFF;
+    --line:#E4DFD3;
+    --ink:#1E2422;
+    --ink-soft:#5B655F;
+    --teal:#2A6F97; /* Changed from #0E4A4D */
+    --teal-deep:#1B4965; /* Changed from #0A3638 */
+    --blood:#4E878B; /* Changed from #A6323F */
+    --blood-soft:#F4E3E1;
+    --amber:#D89A3E;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Noto Sans Devanagari','Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Noto Serif Devanagari',serif;margin:0;}
+
+  /* ===== HEADER ===== */
+  header{
+    background-image: linear-gradient(rgba(27, 73, 101, 0.85), rgba(27, 73, 101, 0.85)), url('https://images.pexels.com/photos/4021775/pexels-photo-4021775.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+    background-size: cover;
+    background-position: center;
+    color:#fff;
+    padding:28px 24px 60px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    /* Decorative element removed for the new theme */
+    content: none;
+  }
+  .header-inner{max-width:980px;margin:0 auto;position:relative;z-index:1;}
+  .hospital-name{
+    font-size:clamp(28px,4vw,40px);
+    font-weight:700;
+    letter-spacing:.2px;
+  }
+  .hospital-tag{color:#CFE3E1;font-size:14px;margin-top:6px;}
+  .helpline {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0,0,0,.2);
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 8px;
+    margin-top: 16px;
+  }
+  .motivation-quote {
+    margin-top: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    text-align: center;
+    font-style: italic;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  main{max-width:980px;margin:-36px auto 60px;padding:0 20px;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px;
+    box-shadow:0 10px 30px -18px rgba(14,74,77,.25);
+  }
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;margin-top:20px;}
+  @media (max-width:780px){ .grid{grid-template-columns:1fr;} }
+
+  .section-title{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--teal);
+    font-weight:600;
+    margin-bottom:14px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .section-title::before{
+    content:"";
+    width:8px;height:8px;border-radius:2px;
+    background:var(--blood);
+    display:inline-block;
+  }
+
+  label{display:block;font-size:13px;color:var(--ink-soft);margin:14px 0 6px;font-weight:600;}
+  label:first-of-type{margin-top:0;}
+  input[type=text], input[type=number], select, textarea{
+    width:100%;
+    padding:11px 13px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:#FBFAF7;
+    font-family:inherit;
+    font-size:15px;
+    color:var(--ink);
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:2px solid var(--teal);
+    outline-offset:1px;
+    background:#fff;
+  }
+  textarea{resize:vertical;min-height:70px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+  /* ===== Upload box ===== */
+  .upload-box{
+    margin-top:6px;
+    border:2px dashed var(--teal);
+    border-radius:12px;
+    padding:22px 14px;
+    text-align:center;
+    cursor:pointer;
+    background:#F1F6F5;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .upload-box:hover{background:#E7F0EF;}
+  .upload-box:active{transform:scale(.99);}
+  .upload-box .icon{font-size:26px;display:block;margin-bottom:6px;}
+  .upload-box p{margin:0;font-size:13.5px;color:var(--ink-soft);}
+  .file-list{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+  .file-chip{
+    display:flex;align-items:center;justify-content:space-between;
+    background:#FBFAF7;border:1px solid var(--line);
+    border-radius:8px;padding:8px 12px;font-size:13.5px;
+  }
+  .file-chip button{
+    border:none;background:none;color:var(--blood);
+    cursor:pointer;font-size:13px;font-weight:600;
+  }
+
+  /* ===== Donor card (signature element) ===== */
+  .donor-card{
+    margin-top:20px;
+    background:linear-gradient(160deg, var(--blood) 0%, #7E2530 100%);
+    color:#fff;
+    border-radius:var(--radius);
+    padding:22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .donor-card svg{position:absolute;right:-16px;bottom:-16px;opacity:.18;width:110px;height:110px;}
+  .donor-card h3{font-size:18px;margin-bottom:6px;}
+  .donor-card p{font-size:13.5px;line-height:1.5;color:#F3DEDD;margin:0 0 16px;}
+  .donor-link{
+    display:inline-flex;align-items:center;gap:8px;
+    background:#fff;color:var(--blood);
+    padding:10px 16px;border-radius:999px;
+    font-weight:700;font-size:14px;
+    text-decoration:none;
+  }
+  .donor-link:hover{background:#FCEFEE;}
+
+  .save-btn{
+    margin-top:22px;
+    width:100%;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    font-size:15.5px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .find-btn {
+    background: var(--amber);
+    color: var(--ink);
+  }
+  .find-btn:hover {
+    background: #c9892f;
+  }
+  .save-btn:hover{background:var(--teal-deep);}
+  .save-msg{text-align:center;font-size:13px;color:var(--teal);margin-top:10px;min-height:16px;}
+  .ai-answer {
+    margin-top: 16px;
+    padding: 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    min-height: 20px;
+  }
+
+  /* ===== Records list ===== */
+  .records{margin-top:34px;}
+  .records h2{font-size:20px;color:var(--teal-deep);margin-bottom:14px;}
+  .record{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+    margin-bottom:12px;
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:10px;
+    align-items:start;
+  }
+  .record-name{font-weight:700;font-size:16px;}
+  .record-meta{font-size:13px;color:var(--ink-soft);margin-top:4px;line-height:1.6;}
+  .bg-pill{
+    display:inline-block;
+    background:var(--blood-soft);
+    color:var(--blood);
+    font-weight:700;
+    font-size:12px;
+    padding:2px 9px;
+    border-radius:999px;
+    margin-right:6px;
+  }
+  .record-docs{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;}
+  .doc-tag{
+    font-size:12px;background:#F1F6F5;border:1px solid var(--line);padding:3px 8px;border-radius:6px;color:var(--teal-deep);
+    text-decoration: none; display: inline-block;
+  }
+  a.doc-tag:hover { background: #E7F0EF; }
+
+  .del-btn{
+    border:none;background:none;color:var(--ink-soft);
+    cursor:pointer;font-size:13px;text-decoration:underline;
+    white-space:nowrap;
+  }
+  .del-btn:hover{color:var(--blood);}
+  .empty{color:var(--ink-soft);font-size:14px;padding:14px 0;}
+
+  /* ===== Login bar ===== */
+  .login-bar{
+    max-width:980px;margin:0 auto;padding:14px 20px 0;
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  }
+  .login-bar label{margin:0;color:#CFE3E1;font-size:12.5px;font-weight:600;white-space:nowrap;}
+  .login-bar input{
+    max-width:260px;padding:8px 12px;border-radius:8px;border:1px solid transparent;
+    font-size:13.5px;font-family:inherit;
+  }
+  .login-bar .status{font-size:12px;color:#CFE3E1;}
+
+  /* ===== Footer ===== */
+  footer{
+    text-align:center;
+    padding:20px;
+    margin-top:30px;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  footer a{
+    color:var(--teal);
+    font-weight:600;
+    text-decoration:none;
+  }
+  footer a:hover{text-decoration:underline;}
+
+  /* ===== Modal (for viewing records) ===== */
+  .modal-overlay{
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(30, 36, 34, 0.7);
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    backdrop-filter: blur(4px);
+    opacity:0;
+    visibility:hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+  }
+  .modal-overlay.show{
+    opacity:1;
+    visibility:visible;
+  }
+  .modal-content{
+    background:var(--bg);
+    border-radius:var(--radius);
+    padding:24px 30px 30px;
+    max-width:600px;
+    width:100%;
+    position:relative;
+    box-shadow:0 15px 40px -10px rgba(0,0,0,.25);
+    transform:scale(.95);
+    transition: transform .2s ease;
+  }
+  .modal-overlay.show .modal-content{
+    transform:scale(1);
+  }
+  .modal-close{
+    position:absolute;
+    top:10px; right:14px;
+    border:none; background:none;
+    font-size:28px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .modal-close:hover{color:var(--ink);}
+  .modal-body h2{font-size:24px;color:var(--teal-deep);margin-bottom:16px;}
+  .modal-body .meta-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+    gap:12px;
+    font-size:14px;
+    margin-bottom:16px;
+  }
+  .modal-body .meta-item strong{display:block;color:var(--ink-soft);font-size:12px;margin-bottom:2px;font-weight:600;}
+  .modal-body .meta-item span{font-weight:500;}
+  .modal-body .section{margin-top:16px;}
+  .modal-body h3{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);font-weight:600;margin-bottom:10px;}
+  .modal-body p{font-size:14.5px;line-height:1.6;margin:0;white-space:pre-wrap;}
+  .record:hover{transform:translateY(-2px); box-shadow:0 8px 20px -15px rgba(14,74,77,.2);}
+  .record{cursor:pointer; transition: transform .15s ease, box-shadow .15s ease;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="hospital-name">नानी माँ</div>
+    <div class="hospital-tag">स्वास्थ्य और देखभाल पोर्टल</div>
+    <div class="motivation-quote" id="dailyQuote"></div>
+    <div class="helpline">📞 हेल्पलाइन: 108</div>
+  </div>
+</header>
+
+<div class="login-bar">
+  <label for="loginEmail">आपका ईमेल (लॉगिन)</label>
+  <input type="text" id="loginEmail" placeholder="you@example.com">
+  <span class="status" id="loginStatus"></span>
+</div>
+
+<main>
+  <div class="card">
+    <div class="grid">
+
+      <!-- LEFT: Patient details -->
+      <div>
+        <div class="section-title">रोगी की जानकारी</div>
+
+        <label for="pname">नाम</label>
+        <input type="text" id="pname" placeholder="पूरा नाम लिखें">
+
+        <div class="row2">
+          <div>
+            <label for="page">उम्र</label>
+            <input type="number" id="page" min="0" placeholder="जैसे 34">
+          </div>
+          <div>
+            <label for="bgroup">ब्लड ग्रुप</label>
+            <select id="bgroup">
+              <option value="">चुनें</option>
+              <option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option>
+              <option>O+</option><option>O-</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="fname">परिवार सदस्य का नाम</label>
+        <input type="text" id="fname" placeholder="सदस्य का पूरा नाम">
+
+        <div class="row2">
+          <div>
+            <label for="fbgroup">परिवार का ब्लड ग्रुप</label>
+            <select id="fbgroup">
+              <option value="">चुनें</option>
+              <option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option>
+              <option>O+</option><option>O-</option>
+            </select>
+          </div>
+          <div>
+            <label for="fage">परिवार सदस्य की उम्र</label>
+            <input type="number" id="fage" min="0" placeholder="जैसे 60">
+          </div>
+        </div>
+
+        <label for="disease">क्या बीमारी है</label>
+        <textarea id="disease" placeholder="बीमारी / लक्षण / पहले से चल रहा इलाज लिखें"></textarea>
+      </div>
+
+      <!-- RIGHT: Documents + donor link -->
+      <div>
+        <div class="section-title">रिपोर्ट / दस्तावेज़ सेव करें</div>
+        <div class="upload-box" id="uploadBox">
+          <span class="icon">📄</span>
+          <p><strong>यहाँ क्लिक करें</strong> और अपनी रिपोर्ट चुनें<br>(PDF, फोटो आदि)</p>
+        </div>
+        <input type="file" id="fileInput" multiple style="display:none">
+        <div class="file-list" id="fileList"></div>
+
+        <div class="donor-card">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <h3>ब्लड डोनर खोजें</h3>
+          <p>ज़रूरत पड़ने पर पास के ब्लड डोनर की जानकारी यहाँ से देखें।</p>
+          <a class="donor-link" href="https://www.friends2support.org/?fbclid=PAT01DUATBwhhleHRuA2FlbQIxMABzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAacmIWSyzLvw5mRNGJmctBouTYWj7cIDqoSYndni0D0UUzlVThF-ExL5EKSJ-Q_aem_9yra74keMoG0F5wi4iz_ww" target="_blank" id="donorLink">🔗 डोनर खोजें</a>
+        </div>
+      </div>
+    </div>
+
+    <button class="save-btn" id="saveBtn">रिकॉर्ड सेव करें</button>
+    <div class="save-msg" id="saveMsg"></div>
+  </div>
+
+  <div class="card" style="margin-top: 24px;">
+    <div class="section-title">नज़दीकी अस्पताल खोजें</div>
+    <p style="font-size:14px; color:var(--ink-soft); margin: 4px 0 16px;">
+      आपातकालीन स्थिति में, अपनी लोकेशन के पास के अस्पताल और उनकी जानकारी (जैसे दूरी और फ़ोन नंबर) खोजने के लिए नीचे दिए गए बटन पर क्लिक करें।
+    </p>
+    <button class="save-btn find-btn" id="findHospitalsBtn" style="width:auto; padding: 10px 16px;">📍 मेरी लोकेशन से खोजें</button>
+
+    <div style="text-align:center; margin: 16px 0; font-size: 13px; color: var(--ink-soft); display: flex; align-items: center; gap: 10px;">
+      <hr style="flex-grow:1; border:none; border-top:1px solid var(--line);"><span style="white-space:nowrap;">या</span><hr style="flex-grow:1; border:none; border-top:1px solid var(--line);">
+    </div>
+
+    <input type="text" id="locationInput" placeholder="शहर, पता या पिन कोड डालें">
+    <button class="save-btn" id="searchLocationBtn" style="margin-top: 10px;">खोजें</button>
+    <div id="locationStatus" style="font-size:13px; color:var(--ink-soft); margin-top:10px; min-height:16px; text-align:center;"></div>
+  </div>
+
+  <div class="card" style="margin-top: 24px;">
+    <div class="section-title">AI डॉक्टर से पूछें</div>
+    <p style="font-size:14px; color:var(--ink-soft); margin: 4px 0 16px;">
+      आप सामान्य स्वास्थ्य समस्याओं (जैसे 'बुखार', 'सर दर्द') के बारे में बेसिक सवाल पूछ सकते हैं। <strong>यह AI केवल जानकारी के लिए है, मेडिकल सलाह के लिए नहीं।</strong>
+    </p>
+    <input type="text" id="aiQuestionInput" placeholder="अपना सवाल यहाँ लिखें...">
+    <button class="save-btn" id="askAiBtn" style="margin-top: 10px;">पूछें</button>
+    <div id="aiAnswer" class="ai-answer">
+      <!-- AI का जवाब यहाँ दिखेगा -->
+    </div>
+  </div>
+
+
+  <div class="records">
+    <h2 style="margin-bottom: 14px; font-size: 20px; color: var(--teal-deep);">सेव किए गए रिकॉर्ड</h2>
+    <div id="recordsWrap"><div class="empty">लोड हो रहा है...</div></div>
+  </div>
+</main>
+
+<footer>
+  <div>
+    <span>सुमित पांडे द्वारा बनाया गया | </span>
+    <a href="https://www.linkedin.com/in/sumit-pandey-93595b387/" target="_blank" rel="noopener noreferrer">LinkedIn</a> | <a href="https://github.com/sumiii135" target="_blank" rel="noopener noreferrer">GitHub</a>
+  </div>
+</footer>
+
+<!-- Modal for viewing a record -->
+<div id="recordModal" class="modal-overlay">
+  <div class="modal-content">
+    <button class="modal-close" id="modalCloseBtn">&times;</button>
+    <div class="modal-body" id="modalBody">
+      <!-- Record details will be injected here by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+let pendingDocs = [];
+
+// ===== Daily Motivation Quote =====
+const quotes = [
+  "स्वास्थ्य सबसे बड़ा धन है।",
+  "एक स्वस्थ शरीर में ही एक स्वस्थ मन निवास करता है।",
+  "जल्दी सोना और जल्दी उठना, मनुष्य को स्वस्थ, धनी और बुद्धिमान बनाता है।",
+  "आपका शरीर आपका मंदिर है, इसे स्वच्छ और पवित्र रखें।",
+  "खुश रहना ही उत्तम स्वास्थ्य की कुंजी है।",
+  "हर दिन थोड़ा व्यायाम आपको डॉक्टर से दूर रखता है।",
+  "संतुलित आहार, सुखी जीवन का आधार।",
+  "सकारात्मक सोच से आधी बीमारी दूर हो जाती है।",
+  "अपने स्वास्थ्य का ध्यान रखें, यह आपकी सबसे बड़ी संपत्ति है।",
+  "प्रकृति के करीब रहें, यह आपको स्वस्थ रखेगी।"
+];
+
+function showDailyQuote() {
+  const quoteEl = document.getElementById('dailyQuote');
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+  const quoteIndex = dayOfYear % quotes.length;
+  quoteEl.textContent = `आज का विचार: "${quotes[quoteIndex]}"`;
+}
+
+showDailyQuote();
+
+// ===== Safety guard: don't crash if storage API isn't ready =====
+window.addEventListener('error', (e) => {
+  console.error('Caught error:', e.error || e.message);
+});
+
+// ===== Storage Helper (using localStorage) =====
+// This creates the `window.storage` object that was missing.
+window.storage = {
+  set: async (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+      return { ok: true };
+    } catch (e) {
+      console.error(`Failed to set item '${key}' in localStorage`, e);
+      return null;
+    }
+  },
+  get: async (key) => {
+    try {
+      const value = localStorage.getItem(key);
+      return { value };
+    } catch (e) {
+      console.error(`Failed to get item '${key}' from localStorage`, e);
+      return null;
+    }
+  },
+  delete: async (key) => localStorage.removeItem(key),
+  list: async (prefix) => ({ keys: Object.keys(localStorage).filter(k => k.startsWith(prefix)) })
+};
+
+// ===== Login email (stored so it's remembered next time) =====
+const loginEmailInput = document.getElementById('loginEmail');
+const loginStatus = document.getElementById('loginStatus');
+
+async function loadLoginEmail(){
+  try {
+    const res = await window.storage.get('loginEmail', false);
+    if (res && res.value) loginEmailInput.value = res.value;
+  } catch (e) { /* nothing saved yet */ }
+}
+loginEmailInput.addEventListener('change', async () => {
+  const val = loginEmailInput.value.trim();
+  if (!val) return;
+  try {
+    await window.storage.set('loginEmail', val, false);
+    loginStatus.textContent = 'सेव हो गया ✓';
+    setTimeout(() => loginStatus.textContent = '', 2000);
+  } catch (e) { console.error(e); }
+});
+loadLoginEmail();
+
+const uploadBox = document.getElementById('uploadBox');
+const fileInput = document.getElementById('fileInput');
+const fileListEl = document.getElementById('fileList');
+
+uploadBox.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  const MAX_FILE_BYTES = 1.5 * 1024 * 1024; // 1.5MB per file (base64 adds ~33% overhead)
+  for (const f of files) {
+    if (f.size > MAX_FILE_BYTES) {
+      alert(`"${f.name}" बहुत बड़ी फ़ाइल है (${(f.size/1024/1024).toFixed(1)}MB). कृपया 1.5MB से छोटी फ़ाइल चुनें, वरना सेव नहीं होगा।`);
+      continue;
+    }
+    const data = await readFileAsBase64(f);
+    pendingDocs.push({ name: f.name, type: f.type, data });
+  }
+  renderFileList();
+  fileInput.value = '';
+});
+
+function readFileAsBase64(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderFileList(){
+  fileListEl.innerHTML = '';
+  pendingDocs.forEach((doc, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'file-chip';
+    chip.innerHTML = `<span>📎 ${escapeHtml(doc.name)}</span>`;
+    const btn = document.createElement('button');
+    btn.textContent = 'हटाएं';
+    btn.onclick = () => { pendingDocs.splice(i,1); renderFileList(); };
+    chip.appendChild(btn);
+    fileListEl.appendChild(chip);
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ===== Save record =====
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const name = document.getElementById('pname').value.trim();
+  const age = document.getElementById('page').value.trim();
+  const bloodGroup = document.getElementById('bgroup').value;
+  const familyBloodGroup = document.getElementById('fbgroup').value;
+  const familyName = document.getElementById('fname').value.trim();
+  const familyAge = document.getElementById('fage').value.trim();
+  const disease = document.getElementById('disease').value.trim();
+  const saveMsg = document.getElementById('saveMsg');
+
+  if (!name) {
+    saveMsg.textContent = 'कृपया नाम लिखें।';
+    saveMsg.style.color = '#A6323F';
+    return;
+  }
+
+  const record = {
+    id: 'p_' + Date.now(),
+    name, age, bloodGroup, familyName, familyBloodGroup, familyAge, disease,
+    documents: pendingDocs,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    const result = await window.storage.set('patients:' + record.id, JSON.stringify(record), false);
+    if (!result) throw new Error('save failed');
+    saveMsg.innerHTML = 'रिकॉर्ड सेव हो गया ✓'; // Use innerHTML to add a link
+    saveMsg.style.color = '#0E4A4D';
+
+    // ===== Open email with record details pre-filled =====
+    const toEmail = loginEmailInput.value.trim();
+    if (toEmail) {
+      const subject = `रोगी रिकॉर्ड: ${name}`;
+      const bodyLines = [
+        `नाम: ${name}`,
+        `उम्र: ${age || '—'}`,
+        `ब्लड ग्रुप: ${bloodGroup || '—'}`,
+        `परिवार सदस्य: ${familyName || '—'}`,
+        `परिवार का ब्लड ग्रुप: ${familyBloodGroup || '—'}`,
+        `परिवार सदस्य की उम्र: ${familyAge || '—'}`,
+        `बीमारी: ${disease || '—'}`,
+        '',
+        record.documents.length
+          ? `अटैच रिपोर्ट (${record.documents.length}): ${record.documents.map(d => d.name).join(', ')}`
+          : 'कोई रिपोर्ट अटैच नहीं की गई।',
+        '',
+        'नोट: ईमेल में फ़ाइलें अपने आप अटैच नहीं होतीं (mailto ऐसा सपोर्ट नहीं करता) — कृपया रिपोर्ट फ़ाइलें मैन्युअली अटैच करें।'
+      ];
+      const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+      // Display a link for the user to click, which is more reliable than auto-opening.
+      saveMsg.innerHTML += ` <a href="${mailtoLink}" target="_blank" rel="noopener">ईमेल भेजने के लिए यहाँ क्लिक करें</a>।`;
+    } else {
+      saveMsg.innerHTML += ' (ईमेल भेजने के लिए ऊपर अपना ईमेल डालें)';
+    }
+
+    // reset form
+    document.getElementById('pname').value = '';
+    document.getElementById('page').value = '';
+    document.getElementById('bgroup').value = '';
+    document.getElementById('fbgroup').value = '';
+    document.getElementById('fname').value = '';
+    document.getElementById('fage').value = '';
+    document.getElementById('disease').value = '';
+    pendingDocs = [];
+    renderFileList();
+
+    loadRecords();
+  } catch (err) {
+    console.error(err);
+    const detail = (err && err.message) ? err.message : 'अज्ञात समस्या';
+    saveMsg.textContent = 'सेव करने में समस्या हुई: ' + detail + ' — अगर फ़ाइल अटैच की थी, कोशिश करें बिना फ़ाइल के सेव करें।';
+    saveMsg.style.color = '#A6323F';
+  }
+});
+
+// ===== Load & render records =====
+async function loadRecords(){
+  const wrap = document.getElementById('recordsWrap');
+  try {
+    const listResult = await window.storage.list('patients:', false);
+    const keys = (listResult && listResult.keys) ? listResult.keys : [];
+    if (keys.length === 0){
+      wrap.innerHTML = '<div class="empty">अभी तक कोई रिकॉर्ड सेव नहीं हुआ है।</div>';
+      return;
+    }
+    const records = [];
+    for (const key of keys){
+      try {
+        const res = await window.storage.get(key, false);
+        if (res && res.value) records.push(JSON.parse(res.value));
+      } catch(e){ /* skip missing */ }
+    }
+    records.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    wrap.innerHTML = '';
+    records.forEach(r => {
+      const el = document.createElement('div');
+      el.className = 'record';
+      const docsHtml = (r.documents && r.documents.length)
+        ? `<div class="record-docs">${r.documents.map(d => `<span class="doc-tag">📎 ${escapeHtml(d.name)}</span>`).join('')}</div>`
+        : '';
+      el.innerHTML = `
+        <div>
+          <div class="record-name">${escapeHtml(r.name)}</div>
+          <div class="record-meta">
+            ${r.bloodGroup ? `<span class="bg-pill">${escapeHtml(r.bloodGroup)}</span>` : ''}
+            उम्र: ${escapeHtml(r.age || '—')}
+            ${r.familyName ? `<br>परिवार सदस्य: ${escapeHtml(r.familyName)}` : ''}
+            ${r.familyBloodGroup ? ` (${escapeHtml(r.familyBloodGroup)})` : ''}
+            ${r.familyAge ? ` (उम्र ${escapeHtml(r.familyAge)})` : ''}
+            ${r.disease ? `<br>बीमारी: ${escapeHtml(r.disease)}` : ''}
+          </div>
+          ${docsHtml}
+        </div>
+        <button class="del-btn" data-id="${r.id}">हटाएं</button>
+      `;
+      // Handle delete button click
+      el.querySelector('.del-btn').addEventListener('click', async (e) => {
+        e.stopPropagation(); // Prevent modal from opening when deleting
+        if (!confirm(`क्या आप वाकई "${escapeHtml(r.name)}" का रिकॉर्ड हटाना चाहते हैं?`)) return;
+        await window.storage.delete('patients:' + r.id, false);
+        loadRecords();
+      });
+
+      // Handle record click to open modal
+      el.addEventListener('click', () => {
+        openRecordModal(r);
+      });
+
+      wrap.appendChild(el);
+    });
+  } catch (err){
+    console.error(err);
+    const detail = (err && err.message) ? err.message : 'अज्ञात समस्या';
+    wrap.innerHTML = '<div class="empty">रिकॉर्ड लोड करने में समस्या हुई: ' + escapeHtml(detail) + '</div>';
+  }
+}
+
+loadRecords();
+
+// ===== Modal Logic =====
+const modal = document.getElementById('recordModal');
+const modalBody = document.getElementById('modalBody');
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+function openRecordModal(record) {
+  modalBody.innerHTML = `
+    <h2>${escapeHtml(record.name)}</h2>
+    <div class="meta-grid">
+      ${record.age ? `<div class="meta-item"><strong>उम्र</strong><span>${escapeHtml(record.age)}</span></div>` : ''}
+      ${record.bloodGroup ? `<div class="meta-item"><strong>ब्लड ग्रुप</strong><span class="bg-pill" style="font-size:14px;padding:3px 10px;">${escapeHtml(record.bloodGroup)}</span></div>` : ''}
+    </div>
+    ${record.familyName ? `
+      <div class="meta-grid">
+        <div class="meta-item"><strong>परिवार सदस्य</strong><span>${escapeHtml(record.familyName)}</span></div>
+        ${record.familyAge ? `<div class="meta-item"><strong>सदस्य की उम्र</strong><span>${escapeHtml(record.familyAge)}</span></div>` : ''}
+        ${record.familyBloodGroup ? `<div class="meta-item"><strong>सदस्य का ब्लड ग्रुप</strong><span>${escapeHtml(record.familyBloodGroup)}</span></div>` : ''}
+      </div>` : ''
+    }
+    ${record.disease ? `
+      <div class="section">
+        <h3>बीमारी / लक्षण</h3>
+        <p>${escapeHtml(record.disease)}</p>
+      </div>` : ''
+    }
+    ${(record.documents && record.documents.length > 0) ? `
+      <div class="section">
+        <h3>अटैच रिपोर्ट</h3>
+        <div class="record-docs">${record.documents.map(d => `<a href="${d.data}" download="${escapeHtml(d.name)}" class="doc-tag" target="_blank" rel="noopener noreferrer">📎 ${escapeHtml(d.name)}</a>`).join('')}</div>
+      </div>` : ''
+    }
+  `;
+  modal.classList.add('show');
+}
+
+function closeRecordModal() {
+  modal.classList.remove('show');
+}
+
+modalCloseBtn.addEventListener('click', closeRecordModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeRecordModal(); });
+
+// ===== Find Nearby Hospitals =====
+document.getElementById('findHospitalsBtn').addEventListener('click', () => {
+  const statusEl = document.getElementById('locationStatus');
+  if (!navigator.geolocation) {
+    statusEl.textContent = 'आपका ब्राउज़र लोकेशन सपोर्ट नहीं करता।';
+    return;
+  }
+
+  statusEl.textContent = 'आपकी लोकेशन का पता लगाया जा रहा है...';
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      statusEl.textContent = `लोकेशन मिल गई! (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`;
+      const mapsUrl = `https://www.google.com/maps/search/hospitals/@${latitude},${longitude},14z`;
+      window.open(mapsUrl, '_blank');
+      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    },
+    (error) => {
+      console.error('Geolocation error:', error);
+      statusEl.textContent = 'लोकेशन का पता नहीं लगा सके। कृपया ब्राउज़र को अनुमति दें।';
+    }
+  );
+});
+
+document.getElementById('searchLocationBtn').addEventListener('click', () => {
+  const locationInput = document.getElementById('locationInput');
+  const locationQuery = locationInput.value.trim();
+  if (!locationQuery) {
+    document.getElementById('locationStatus').textContent = 'कृपया खोजने के लिए कोई लोकेशन डालें।';
+    return;
+  }
+  const mapsUrl = `https://www.google.com/maps/search/hospitals+near+${encodeURIComponent(locationQuery)}`;
+  window.open(mapsUrl, '_blank');
+});
+
+// ===== AI Doctor Logic =====
+document.getElementById('askAiBtn').addEventListener('click', () => {
+  const question = document.getElementById('aiQuestionInput').value.toLowerCase().trim();
+  const answerEl = document.getElementById('aiAnswer');
+
+  const knowledgeBase = {
+    "बुखार": "हल्के बुखार के लिए, आराम करें और खूब सारे तरल पदार्थ पिएं। आप पैरासिटामोल ले सकते हैं। अगर बुखार 102°F से ज़्यादा है या 3 दिन से ज़्यादा रहता है, तो डॉक्टर से सलाह लें।",
+    "fever": "हल्के बुखार के लिए, आराम करें और खूब सारे तरल पदार्थ पिएं। आप पैरासिटामोल ले सकते हैं। अगर बुखार 102°F से ज़्यादा है या 3 दिन से ज़्यादा रहता है, तो डॉक्टर से सलाह लें।",
+    "सर दर्द": "सामान्य सर दर्द के लिए, आराम करें, पानी पिएं और शांत जगह पर लेटें। अगर दर्द बहुत तेज़ है या बार-बार हो रहा है, तो डॉक्टर को दिखाएं।",
+    "headache": "सामान्य सर दर्द के लिए, आराम करें, पानी पिएं और शांत जगह पर लेटें। अगर दर्द बहुत तेज़ है या बार-बार हो रहा है, तो डॉक्टर को दिखाएं।",
+    "खांसी": "खांसी और जुकाम के लिए, गर्म पानी, अदरक की चाय या शहद का सेवन करें। भाप लेना भी फायदेमंद हो सकता है। अगर लक्षण एक हफ़्ते से ज़्यादा रहें, तो डॉक्टर से मिलें।",
+    "cough": "खांसी और जुकाम के लिए, गर्म पानी, अदरक की चाय या शहद का सेवन करें। भाप लेना भी फायदेमंद हो सकता है। अगर लक्षण एक हफ़्ते से ज़्यादा रहें, तो डॉक्टर से मिलें।",
+    "जुकाम": "खांसी और जुकाम के लिए, गर्म पानी, अदरक की चाय या शहद का सेवन करें। भाप लेना भी फायदेमंद हो सकता है। अगर लक्षण एक हफ़्ते से ज़्यादा रहें, तो डॉक्टर से मिलें।",
+    "cold": "खांसी और जुकाम के लिए, गर्म पानी, अदरक की चाय या शहद का सेवन करें। भाप लेना भी फायदेमंद हो सकता है। अगर लक्षण एक हफ़्ते से ज़्यादा रहें, तो डॉक्टर से मिलें।",
+    "पेट दर्द": "हल्के पेट दर्द के लिए, हल्का खाना खाएं और अजवाइन का पानी पिएं। अगर दर्द तेज़ है, या इसके साथ उल्टी या बुखार है, तो तुरंत डॉक्टर से संपर्क करें।",
+    "stomach ache": "हल्के पेट दर्द के लिए, हल्का खाना खाएं और अजवाइन का पानी पिएं। अगर दर्द तेज़ है, या इसके साथ उल्टी या बुखार है, तो तुरंत डॉक्टर से संपर्क करें।"
+  };
+
+  let foundAnswer = null;
+  for (const keyword in knowledgeBase) {
+    if (question.includes(keyword)) {
+      foundAnswer = knowledgeBase[keyword];
+      break;
+    }
+  }
+
+  if (foundAnswer) {
+    answerEl.textContent = foundAnswer;
+  } else {
+    answerEl.textContent = "माफ़ करें, मैं इस बारे में जानकारी नहीं दे सकता। यह एक बेसिक AI है। गंभीर स्वास्थ्य समस्याओं के लिए, कृपया किसी असली डॉक्टर से सलाह लें या हेल्पलाइन 108 पर कॉल करें।";
+  }
+});
+
+</script>
+</body>
+</html>
