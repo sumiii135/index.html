@@ -400,6 +400,12 @@
 
         <label for="disease">क्या बीमारी है</label>
         <textarea id="disease" placeholder="बीमारी / लक्षण / पहले से चल रहा इलाज लिखें"></textarea>
+
+        <label for="drName">डॉक्टर का नाम (वैकल्पिक)</label>
+        <input type="text" id="drName" placeholder="जैसे, डॉ. गुप्ता">
+
+        <label for="drNumber">डॉक्टर का नंबर (वैकल्पिक)</label>
+        <input type="text" id="drNumber" placeholder="जैसे, 9876543210">
       </div>
 
       <!-- RIGHT: Documents + donor link -->
@@ -613,6 +619,8 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   const familyName = document.getElementById('fname').value.trim();
   const familyAge = document.getElementById('fage').value.trim();
   const disease = document.getElementById('disease').value.trim();
+  const drName = document.getElementById('drName').value.trim();
+  const drNumber = document.getElementById('drNumber').value.trim();
   const saveMsg = document.getElementById('saveMsg');
 
   if (!name) {
@@ -623,7 +631,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
 
   const record = {
     id: 'p_' + Date.now(),
-    name, age, weight, bloodGroup, familyName, familyBloodGroup, familyAge, disease,
+    name, age, weight, bloodGroup, familyName, familyBloodGroup, familyAge, disease, drName, drNumber,
     documents: pendingDocs,
     createdAt: new Date().toISOString()
   };
@@ -648,6 +656,8 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
         `परिवार सदस्य की उम्र: ${familyAge || '—'}`,
         `बीमारी: ${disease || '—'}`,
         '',
+        `डॉक्टर: ${drName || '—'}`,
+        `डॉक्टर का नंबर: ${drNumber || '—'}`,
         record.documents.length
           ? `अटैच रिपोर्ट (${record.documents.length}): ${record.documents.map(d => d.name).join(', ')}`
           : 'कोई रिपोर्ट अटैच नहीं की गई।',
@@ -670,6 +680,8 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     document.getElementById('fname').value = '';
     document.getElementById('fage').value = '';
     document.getElementById('disease').value = '';
+    document.getElementById('drName').value = '';
+    document.getElementById('drNumber').value = '';
     pendingDocs = [];
     renderFileList();
 
@@ -718,6 +730,7 @@ async function loadRecords(){
             ${r.familyBloodGroup ? ` (${escapeHtml(r.familyBloodGroup)})` : ''}
             ${r.familyAge ? ` (उम्र ${escapeHtml(r.familyAge)})` : ''}
             ${r.disease ? `<br>बीमारी: ${escapeHtml(r.disease)}` : ''}
+            ${r.drName ? `<br>डॉक्टर: ${escapeHtml(r.drName)} (${escapeHtml(r.drNumber || 'N/A')})` : ''}
           </div>
           ${docsHtml}
         </div>
@@ -765,6 +778,12 @@ function openRecordModal(record) {
         <div class="meta-item"><strong>परिवार सदस्य</strong><span>${escapeHtml(record.familyName)}</span></div>
         ${record.familyAge ? `<div class="meta-item"><strong>सदस्य की उम्र</strong><span>${escapeHtml(record.familyAge)}</span></div>` : ''}
         ${record.familyBloodGroup ? `<div class="meta-item"><strong>सदस्य का ब्लड ग्रुप</strong><span>${escapeHtml(record.familyBloodGroup)}</span></div>` : ''}
+      </div>` : ''
+    }
+    ${record.drName ? `
+      <div class="meta-grid">
+        <div class="meta-item"><strong>डॉक्टर का नाम</strong><span>${escapeHtml(record.drName)}</span></div>
+        ${record.drNumber ? `<div class="meta-item"><strong>डॉक्टर का नंबर</strong><span>${escapeHtml(record.drNumber)}</span></div>` : ''}
       </div>` : ''
     }
     ${record.disease ? `
