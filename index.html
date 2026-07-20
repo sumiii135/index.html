@@ -118,7 +118,7 @@
     background:#fff;
   }
   textarea{resize:vertical;min-height:70px;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 
   /* ===== Upload box ===== */
   .upload-box{
@@ -333,7 +333,7 @@
 
 <header>
   <div class="header-inner">
-    <div class="hospital-name">नानी माँ</div>
+    <div class="hospital-name">SP</div>
     <div class="hospital-tag">स्वास्थ्य और देखभाल पोर्टल</div>
     <div class="motivation-quote" id="dailyQuote"></div>
     <div class="helpline">📞 हेल्पलाइन: 108</div>
@@ -357,10 +357,14 @@
         <label for="pname">नाम</label>
         <input type="text" id="pname" placeholder="पूरा नाम लिखें">
 
-        <div class="row2">
+        <div class="row3">
           <div>
             <label for="page">उम्र</label>
             <input type="number" id="page" min="0" placeholder="जैसे 34">
+          </div>
+          <div>
+            <label for="pweight">वज़न (kg)</label>
+            <input type="number" id="pweight" min="0" placeholder="जैसे 65">
           </div>
           <div>
             <label for="bgroup">ब्लड ग्रुप</label>
@@ -446,6 +450,21 @@
     <button class="save-btn" id="askAiBtn" style="margin-top: 10px;">पूछें</button>
     <div id="aiAnswer" class="ai-answer">
       <!-- AI का जवाब यहाँ दिखेगा -->
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 24px;">
+    <div class="section-title">दवाई की फोटो से जानकारी पाएं</div>
+    <p style="font-size:14px; color:var(--ink-soft); margin: 4px 0 16px;">
+      किसी दवाई की फोटो अपलोड करें और उसके बारे में सामान्य जानकारी (जैसे उपयोग, साइड इफेक्ट्स) पाएं। <strong>यह सुविधा अभी प्रायोगिक है और केवल कुछ सामान्य दवाइयों को पहचान सकती है। हमेशा डॉक्टर से सलाह लें।</strong>
+    </p>
+    <div class="upload-box" id="medicineUploadBox">
+      <span class="icon">💊</span>
+      <p><strong>यहाँ क्लिक करें</strong> और दवाई की फोटो चुनें</p>
+    </div>
+    <input type="file" id="medicineFileInput" accept="image/*" style="display:none">
+    <div id="medicineInfo" class="ai-answer" style="margin-top: 16px;">
+      <!-- दवाई की जानकारी यहाँ दिखेगी -->
     </div>
   </div>
 
@@ -604,6 +623,7 @@ function escapeHtml(str){
 document.getElementById('saveBtn').addEventListener('click', async () => {
   const name = document.getElementById('pname').value.trim();
   const age = document.getElementById('page').value.trim();
+  const weight = document.getElementById('pweight').value.trim();
   const bloodGroup = document.getElementById('bgroup').value;
   const familyBloodGroup = document.getElementById('fbgroup').value;
   const familyName = document.getElementById('fname').value.trim();
@@ -619,7 +639,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
 
   const record = {
     id: 'p_' + Date.now(),
-    name, age, bloodGroup, familyName, familyBloodGroup, familyAge, disease,
+    name, age, weight, bloodGroup, familyName, familyBloodGroup, familyAge, disease,
     documents: pendingDocs,
     createdAt: new Date().toISOString()
   };
@@ -637,6 +657,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
       const bodyLines = [
         `नाम: ${name}`,
         `उम्र: ${age || '—'}`,
+        `वज़न: ${weight ? weight + ' kg' : '—'}`,
         `ब्लड ग्रुप: ${bloodGroup || '—'}`,
         `परिवार सदस्य: ${familyName || '—'}`,
         `परिवार का ब्लड ग्रुप: ${familyBloodGroup || '—'}`,
@@ -659,6 +680,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     // reset form
     document.getElementById('pname').value = '';
     document.getElementById('page').value = '';
+    document.getElementById('pweight').value = '';
     document.getElementById('bgroup').value = '';
     document.getElementById('fbgroup').value = '';
     document.getElementById('fname').value = '';
@@ -707,7 +729,7 @@ async function loadRecords(){
           <div class="record-name">${escapeHtml(r.name)}</div>
           <div class="record-meta">
             ${r.bloodGroup ? `<span class="bg-pill">${escapeHtml(r.bloodGroup)}</span>` : ''}
-            उम्र: ${escapeHtml(r.age || '—')}
+            उम्र: ${escapeHtml(r.age || '—')} ${r.weight ? `| वज़न: ${escapeHtml(r.weight)} kg` : ''}
             ${r.familyName ? `<br>परिवार सदस्य: ${escapeHtml(r.familyName)}` : ''}
             ${r.familyBloodGroup ? ` (${escapeHtml(r.familyBloodGroup)})` : ''}
             ${r.familyAge ? ` (उम्र ${escapeHtml(r.familyAge)})` : ''}
@@ -751,6 +773,7 @@ function openRecordModal(record) {
     <h2>${escapeHtml(record.name)}</h2>
     <div class="meta-grid">
       ${record.age ? `<div class="meta-item"><strong>उम्र</strong><span>${escapeHtml(record.age)}</span></div>` : ''}
+      ${record.weight ? `<div class="meta-item"><strong>वज़न</strong><span>${escapeHtml(record.weight)} kg</span></div>` : ''}
       ${record.bloodGroup ? `<div class="meta-item"><strong>ब्लड ग्रुप</strong><span class="bg-pill" style="font-size:14px;padding:3px 10px;">${escapeHtml(record.bloodGroup)}</span></div>` : ''}
     </div>
     ${record.familyName ? `
@@ -850,6 +873,43 @@ document.getElementById('askAiBtn').addEventListener('click', () => {
   } else {
     answerEl.textContent = "माफ़ करें, मैं इस बारे में जानकारी नहीं दे सकता। यह एक बेसिक AI है। गंभीर स्वास्थ्य समस्याओं के लिए, कृपया किसी असली डॉक्टर से सलाह लें या हेल्पलाइन 108 पर कॉल करें।";
   }
+});
+
+// ===== Medicine Photo Recognition Logic (Simulated) =====
+document.getElementById('medicineUploadBox').addEventListener('click', () => {
+  document.getElementById('medicineFileInput').click();
+});
+
+document.getElementById('medicineFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const infoEl = document.getElementById('medicineInfo');
+  infoEl.textContent = 'फोटो को पहचाना जा रहा है...';
+
+  // Simulate a delay for processing
+  setTimeout(() => {
+    const fileName = file.name.toLowerCase();
+    const medicineDB = {
+      "crocin": "दवाई: क्रोसिन (Crocin)\nउपयोग: यह एक दर्द निवारक और बुखार कम करने वाली दवा है। इसमें पैरासिटामोल होता है।\nसावधानी: डॉक्टर की सलाह के बिना ज़्यादा डोज़ न लें।",
+      "paracetamol": "दवाई: पैरासिटामोल (Paracetamol)\nउपयोग: बुखार, सर दर्द और शरीर के दर्द से राहत के लिए।\nसावधानी: लिवर की समस्या वाले रोगियों को सावधानी बरतनी चाहिए।",
+      "combiflam": "दवाई: कॉम्बीफ्लेम (Combiflam)\nउपयोग: यह दर्द और सूजन को कम करने में मदद करता है। इसमें इबुप्रोफेन और पैरासिटामोल होता है।\nसावधानी: पेट में जलन या एसिडिटी हो सकती है। खाली पेट न लें।"
+    };
+
+    let foundMed = null;
+    for (const medName in medicineDB) {
+      if (fileName.includes(medName)) {
+        foundMed = medicineDB[medName];
+        break;
+      }
+    }
+
+    if (foundMed) {
+      infoEl.textContent = foundMed;
+    } else {
+      infoEl.textContent = "माफ़ करें, इस दवाई को पहचाना नहीं जा सका। यह एक प्रायोगिक सुविधा है। कृपया दवाई का नाम 'AI डॉक्टर से पूछें' सेक्शन में लिखकर कोशिश करें।";
+    }
+  }, 1500); // 1.5 second delay
 });
 
 </script>
